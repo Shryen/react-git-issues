@@ -9,6 +9,8 @@ export default function Issues() {
   const {
     isLoading,
     isSuccess,
+    isError,
+    error,
     data: issues,
   } = useQuery({ queryKey: ["issues", isOpen], queryFn: fetchIssues });
 
@@ -44,11 +46,14 @@ export default function Issues() {
 
   return (
     <div>
-      {isLoading && <p className="loader">Loading...</p>}
-      {isSuccess && (
+      {isLoading && <p className="loader"></p>}
+      {isError && <p>{error.message}</p>}
+      {isSuccess && issues && (
         <div className="issues-container">
           <div className="issues-heading">
-            <a href="#">facebook / create-react-app</a>
+            <a href="https://github.com/facebok/create-react-app">
+              facebook / create-react-app
+            </a>
             <div className="open-closed-buttons">
               <button onClick={() => setIsOpen("open")}>
                 <IconOpen />
@@ -69,39 +74,57 @@ export default function Issues() {
             </div>
           </div>
           <div className="issues-table">
-            {issues.map((issue) => (
-              <div key={issue.number} className="issues-entry">
-                <div className="issues-entry-title-container">
-                  {issue.state === "open" ? <IconOpen /> : <IconClosed />}
-                  <div className="issues-title">
-                    <Link to="/issues/1">{issue.title}</Link>
-                    <div className="issues-title-details">
-                      #{issue.number} opened{" "}
-                      {formatDistance(new Date(), new Date(issue.created_at))}{" "}
-                      by {issue.user.login}
+            {issues.length > 0 ? (
+              <div>
+                {issues.map((issue) => (
+                  <div key={issue.number} className="issues-entry">
+                    <div className="issues-entry-title-container">
+                      {issue.state === "open" && <IconOpen />}
+                      {issue.state === "closed" && <IconClosed />}
+                      <div className="issues-title">
+                        <Link to={`/issues/${issue.number}`}>
+                          {issue.title}
+                        </Link>
+                        <div className="issues-title-details">
+                          #{issue.number} opened{" "}
+                          {formatDistance(
+                            new Date(issue.created_at),
+                            new Date(),
+                            {
+                              addSuffix: true,
+                            }
+                          )}{" "}
+                          by {issue.user.login}
+                        </div>
+                      </div>
                     </div>
+                    {issue.comments > 0 && (
+                      <Link
+                        to={`/issues/${issue.number}`}
+                        className="comments-count-container"
+                      >
+                        <svg
+                          className="octicon octicon-comment v-align-middle"
+                          viewBox="0 0 16 16"
+                          version="1.1"
+                          width="16"
+                          height="16"
+                          aria-hidden="true"
+                        >
+                          <path
+                            fill-rule="evenodd"
+                            d="M2.75 2.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h2a.75.75 0 01.75.75v2.19l2.72-2.72a.75.75 0 01.53-.22h4.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25H2.75zM1 2.75C1 1.784 1.784 1 2.75 1h10.5c.966 0 1.75.784 1.75 1.75v7.5A1.75 1.75 0 0113.25 12H9.06l-2.573 2.573A1.457 1.457 0 014 13.543V12H2.75A1.75 1.75 0 011 10.25v-7.5z"
+                          ></path>
+                        </svg>
+                        <div className="comments-count">{issue.comments}</div>
+                      </Link>
+                    )}
                   </div>
-                </div>
-                {issue.comments > 0 && (
-                  <Link to="/issues/1" className="comments-count-container">
-                    <svg
-                      className="octicon octicon-comment v-align-middle"
-                      viewBox="0 0 16 16"
-                      version="1.1"
-                      width="16"
-                      height="16"
-                      aria-hidden="true"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M2.75 2.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h2a.75.75 0 01.75.75v2.19l2.72-2.72a.75.75 0 01.53-.22h4.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25H2.75zM1 2.75C1 1.784 1.784 1 2.75 1h10.5c.966 0 1.75.784 1.75 1.75v7.5A1.75 1.75 0 0113.25 12H9.06l-2.573 2.573A1.457 1.457 0 014 13.543V12H2.75A1.75 1.75 0 011 10.25v-7.5z"
-                      ></path>
-                    </svg>
-                    <div className="comments-count">{issue.comments}</div>
-                  </Link>
-                )}
+                ))}
               </div>
-            ))}
+            ) : (
+              "No issues found"
+            )}
           </div>
         </div>
       )}

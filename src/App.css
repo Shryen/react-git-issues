@@ -231,3 +231,19 @@ svg {
   padding-top: 32px;
   border-bottom: 1px solid #F3F4F6;
 }
+
+.loader {
+  width: 40px;
+  aspect-ratio: 1;
+   --c: linear-gradient(#000 0 0);
+   --m: radial-gradient(farthest-side,#000 92%,#0000);
+  background: 
+    var(--c),var(--m),
+    var(--c),var(--m), 
+    var(--c),var(--m);
+  background-size: 8px 15px,8px 8px;
+  background-repeat: no-repeat;
+  animation: l14 1s infinite alternate;
+  margin: 0 auto;
+  margin-top: 1rem;
+}
